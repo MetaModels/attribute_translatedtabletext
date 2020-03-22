@@ -2,7 +2,7 @@
 /**
  * This file is part of MetaModels/attribute_translatedtabletext.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2020 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,9 +12,9 @@
  * Translations are managed automatically using Transifex. To create a new translation
  * or to help to maintain an existing one, please register at transifex.com.
  *
- * Last-updated: 2019-01-17T22:01:22+01:00
+ * Last-updated: 2020-03-22T19:02:46+01:00
  *
- * @copyright 2012-2019 The MetaModels team.
+ * @copyright 2012-2020 The MetaModels team.
  * @license   https://github.com/MetaModels/attribute_translatedtabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @link      https://www.transifex.com/metamodels/public/
  * @link      https://www.transifex.com/signup/?join_project=metamodels
@@ -22,5 +22,5 @@
 
 
 $GLOBALS['TL_LANG']['tl_metamodel_rendersetting']['translatedtabletext_hide_tablehead']['0'] = 'Tabellenkopf verbergen';
-$GLOBALS['TL_LANG']['tl_metamodel_rendersetting']['translatedtabletext_hide_tablehead']['1'] = 'Auswählen um den Tabellenkopf zu verbergen.';
+$GLOBALS['TL_LANG']['tl_metamodel_rendersetting']['translatedtabletext_hide_tablehead']['1'] = 'Auswählen, um den Tabellenkopf zu verbergen.';
 
