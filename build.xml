@@ -8,5 +8,5 @@
 -->
 <project name="metamodels/attribute_translatedtabletext" default="build">
     <import file="vendor/phpcq/phpcq/phpcq.main.xml"/>
-	<target name="phpspec" />
+    <target name="phpspec" />
 </project>
