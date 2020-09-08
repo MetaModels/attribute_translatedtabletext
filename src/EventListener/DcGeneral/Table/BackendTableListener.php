@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_translatedtabletext.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2020 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -17,7 +17,8 @@
  * @author     David Greminger <david.greminger@1up.io>
  * @author     Sven Baumann <baumann.sv@gmail.com>
  * @author     David Molineus <david.molineus@netzmacht.de>
- * @copyright  2012-2019 The MetaModels team.
+ * @author     Ingolf Steinhardt <info@e-spin.de>
+ * @copyright  2012-2020 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_translatedtabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -157,13 +158,12 @@ class BackendTableListener
         $data['columnFields']['rowLabels']['eval']['minCount']                          = $intCols;
         $data['columnFields']['rowLabels']['eval']['maxCount']                          = $intCols;
         $data['columnFields']['rowLabels']['eval']['columnFields']['rowLabel']['label'] = $translator->translate(
-            'tabletext_rowLabel',
+            'tabletext_rowLabel.0',
             'tl_metamodel_attribute'
         );
 
-        $data['columnFields']['rowLabels']['eval']['columnFields']['rowLabel']['eval']  = $arrRowClasses;
         $data['columnFields']['rowLabels']['eval']['columnFields']['rowStyle']['label'] = $translator->translate(
-            'tabletext_rowStyle',
+            'tabletext_rowStyle.0',
             'tl_metamodel_attribute'
         );
 
@@ -207,7 +207,7 @@ class BackendTableListener
 
         // Kick unused lines.
         foreach ((array) $varValue as $strLanguage => $arrRows) {
-            if (\count($arrRows) > $intCols) {
+            if (\count((array) $arrRows) > $intCols) {
                 $varValue[$strLanguage] = array_slice($varValue[$strLanguage], 0, $intCols);
             }
         }

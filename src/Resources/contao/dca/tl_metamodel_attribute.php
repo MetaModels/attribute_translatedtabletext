@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_translatedtabletext.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2020 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,7 +16,8 @@
  * @author     David Greminger <david.greminger@1up.io>
  * @author     Sven Baumann <baumann.sv@gmail.com>
  * @author     David Molineus <david.molineus@netzmacht.de>
- * @copyright  2012-2019 The MetaModels team.
+ * @author     Ingolf Steinhardt <info@e-spin.de>
+ * @copyright  2012-2020 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_translatedtabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -53,7 +54,11 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tabletext_quantity_cols'
     'inputType' => 'select',
     'default'   => 1,
     'options'   => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-    'eval'      => ['tl_class' => 'clr m12', 'alwaysSave' => true, 'submitOnChange' => true],
+    'eval'      => [
+        'tl_class'       => 'clr w50 m12',
+        'alwaysSave'     => true,
+        'submitOnChange' => true
+    ],
     'sql'       => 'varchar(2) NOT NULL default \'\''
 ];
 
@@ -62,37 +67,40 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['translatedtabletext_cols
     'exclude'   => true,
     'inputType' => 'multiColumnWizard',
     'eval'      => [
-        'disableSorting'                     => true,
-        'tl_class'                           => 'clr',
-        'columnFields'                       => [
-            'langcode'                       => [
-                'exclude'                    => true,
-                'inputType'                  => 'justtextoption',
-                'eval'                       => [
-                    'style'                  => 'min-width:75px;display:block;padding-top:28px;',
-                    'valign'                 => 'top',
+        'hideButtons'    => true,
+        'disableSorting' => true,
+        'tl_class'       => 'clr w50',
+        'columnFields'   => [
+            'langcode'  => [
+                'exclude'   => true,
+                'inputType' => 'justtextoption',
+                'eval'      => [
+                    'style'  => 'min-width:75px;display:block;padding-top:28px;',
+                    'valign' => 'top',
                 ],
             ],
-            'rowLabels'                     => [
-                'exclude'                    => true,
-                'inputType'                  => 'multiColumnWizard',
-                'eval'                       => [
-                    'disableSorting'         => true,
-                    'tl_class'               => 'clr',
-                    'columnFields'           => [
-                        'rowLabel'           => [
-                            'exclude'        => true,
-                            'inputType'      => 'text',
-                            'eval'           => [
-                                'style'      => 'width:400px;',
-                                'rows'       => 2,
+            'rowLabels' => [
+                'exclude'   => true,
+                'inputType' => 'multiColumnWizard',
+                'eval'      => [
+                    'hideButtons'    => true,
+                    'disableSorting' => true,
+                    'tl_class'       => 'clr',
+                    'columnFields'   => [
+                        'rowLabel' => [
+                            'exclude'   => true,
+                            'inputType' => 'text',
+                            'eval'      => [
+                                'allowHtml' => true,
+                                'style'     => 'width: 400px;',
                             ],
                         ],
-                        'rowStyle'           => [
-                            'inputType'      => 'text',
-                            'eval'           => [
-                                'allowHtml'  => false,
-                                'style'      => 'width: 90px;',
+                        'rowStyle' => [
+                            'exclude'   => true,
+                            'inputType' => 'text',
+                            'eval'      => [
+                                'allowHtml' => false,
+                                'style'     => 'width: 90px;',
                             ],
                         ],
                     ],
@@ -100,5 +108,5 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['translatedtabletext_cols
             ],
         ],
     ],
-    'sql'   => 'blob NULL'
+    'sql'       => 'blob NULL'
 ];
