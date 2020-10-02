@@ -258,6 +258,9 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
         $this->unsetValueFor($arrIds, $strLangCode);
 
         foreach ($arrIds as $intId) {
+            if (!\is_array($arrValues[$intId]) || empty($arrValues[$intId])) {
+                continue;
+            }
             // Walk every row.
             foreach ($arrValues[$intId] as $row) {
                 // Walk every column and insert the value.
