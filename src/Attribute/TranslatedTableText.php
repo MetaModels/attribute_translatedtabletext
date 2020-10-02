@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_translatedtabletext.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2020 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -19,7 +19,7 @@
  * @author     Ingolf Steinhardt <info@e-spin.de>
  * @author     David Molineus <david.molineus@netzmacht.de>
  * @author     Sven Baumann <baumann.sv@gmail.com>
- * @copyright  2012-2019 The MetaModels team.
+ * @copyright  2012-2020 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_translatedtabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -186,11 +186,11 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
         $countCol    = $this->get('tabletext_quantity_cols');
         $widgetValue = [];
 
-        foreach ($varValue as $k => $row) {
-            for ($kk = 0; $kk < $countCol; $kk++) {
-                $i = \array_search($kk, \array_column($row, 'col'));
+        foreach ($varValue as $key => $row) {
+            for ($column = 0; $column < $countCol; $column++) {
+                $index = \array_search($column, \array_column($row, 'col'));
 
-                $widgetValue[$k]['col_' . $kk] = ($i !== false) ? $row[$i]['value'] : '';
+                $widgetValue[$key]['col_' . $column] = ($index !== false) ? $row[$index]['value'] : '';
             }
         }
 

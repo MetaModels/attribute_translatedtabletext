@@ -24,9 +24,7 @@ use MetaModels\AttributeTranslatedTableTextBundle\DatabaseAccessor;
 use MetaModels\IMetaModel;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Unit tests to test class GeoProtection.
- */
+/** @covers \MetaModels\AttributeTranslatedTableTextBundle\Attribute\TranslatedTableText */
 class TranslatedTableTextTest extends TestCase
 {
     /**
