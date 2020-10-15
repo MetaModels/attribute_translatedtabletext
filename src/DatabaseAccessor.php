@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_translatedtabletext.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2020 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,7 +12,8 @@
  *
  * @package    MetaModels/attribute_translatedtabletext
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
- * @copyright  2012-2019 The MetaModels team.
+ * @author     Ingolf Steinhardt <info@e-spin.de>
+ * @copyright  2012-2020 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_translatedtabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -67,13 +68,13 @@ class DatabaseAccessor
 
         $queryBuilder
             ->values([
-                'tstamp'   => ':tstamp',
-                'value'    => ':value',
-                'att_id'   => ':att_id',
-                'row'      => ':row',
-                'col'      => ':col',
-                'item_id'  => ':item_id',
-                'langcode' => ':langcode',
+                'tl_metamodel_translatedtabletext.tstamp'   => ':tstamp',
+                'tl_metamodel_translatedtabletext.value'    => ':value',
+                'tl_metamodel_translatedtabletext.att_id'   => ':att_id',
+                'tl_metamodel_translatedtabletext.row'      => ':row',
+                'tl_metamodel_translatedtabletext.col'      => ':col',
+                'tl_metamodel_translatedtabletext.item_id'  => ':item_id',
+                'tl_metamodel_translatedtabletext.langcode' => ':langcode',
             ])
             ->setParameters([
                 'tstamp'   => \time(),
@@ -101,14 +102,14 @@ class DatabaseAccessor
     {
         $queryBuilder = $this->connection->createQueryBuilder()->delete('tl_metamodel_translatedtabletext');
         $queryBuilder
-            ->andWhere('att_id=:att_id')
+            ->andWhere('tl_metamodel_translatedtabletext.att_id=:att_id')
             ->setParameter('att_id', $attributeId);
         $queryBuilder
-            ->andWhere('item_id IN (:item_ids)')
+            ->andWhere('tl_metamodel_translatedtabletext.item_id IN (:item_ids)')
             ->setParameter('item_ids', $idsList, Connection::PARAM_STR_ARRAY);
         if (null !== $language) {
             $queryBuilder
-                ->andWhere('langcode=:langcode')
+                ->andWhere('tl_metamodel_translatedtabletext.langcode=:langcode')
                 ->setParameter('langcode', $language);
         }
 
@@ -129,19 +130,19 @@ class DatabaseAccessor
     {
         $queryBuilder = $this->connection->createQueryBuilder()
             ->select('*')
-            ->from('tl_metamodel_translatedtabletext')
-            ->orderBy('item_id', 'ASC')
-            ->addOrderBy('row', 'ASC')
-            ->addOrderBy('col', 'ASC');
+            ->from('tl_metamodel_translatedtabletext', 't')
+            ->orderBy('t.item_id', 'ASC')
+            ->addOrderBy('t.row', 'ASC')
+            ->addOrderBy('t.col', 'ASC');
 
         $queryBuilder
-            ->andWhere('att_id=:att_id')
+            ->andWhere('t.att_id=:att_id')
             ->setParameter('att_id', $attributeId);
         $queryBuilder
-            ->andWhere('item_id IN (:item_ids)')
+            ->andWhere('t.item_id IN (:item_ids)')
             ->setParameter('item_ids', $idsList, Connection::PARAM_STR_ARRAY);
         $queryBuilder
-            ->andWhere('langcode=:langcode')
+            ->andWhere('t.langcode=:langcode')
             ->setParameter('langcode', $language);
 
         $statement = $queryBuilder->execute();
