@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_translatedtabletext.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2020 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -19,7 +19,7 @@
  * @author     Ingolf Steinhardt <info@e-spin.de>
  * @author     David Molineus <david.molineus@netzmacht.de>
  * @author     Sven Baumann <baumann.sv@gmail.com>
- * @copyright  2012-2019 The MetaModels team.
+ * @copyright  2012-2020 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_translatedtabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -84,6 +84,9 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
             [
                 'translatedtabletext_cols',
                 'tabletext_quantity_cols',
+                'translatedtabletext_minCount',
+                'translatedtabletext_maxCount',
+                'translatedtabletext_disable_sorting'
             ]
         );
     }
@@ -107,8 +110,19 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
         }
 
         // Build DCA.
-        $arrFieldDef                         = parent::getFieldDefinition($arrOverrides);
-        $arrFieldDef['inputType']            = 'multiColumnWizard';
+        $arrFieldDef                     = parent::getFieldDefinition($arrOverrides);
+        $arrFieldDef['inputType']        = 'multiColumnWizard';
+        $arrFieldDef['eval']['minCount'] = $this->get('translatedtabletext_minCount') ?: '0';
+        $arrFieldDef['eval']['maxCount'] = $this->get('translatedtabletext_maxCount') ?: '0';
+
+        if ($this->get('translatedtabletext_disable_sorting')) {
+            $arrFieldDef['eval']['buttons'] = [
+                'move' => false,
+                'up'   => false,
+                'down' => false
+            ];
+        }
+
         $arrFieldDef['eval']['columnFields'] = [];
 
         $countCol = \count($arrColLabels);
@@ -153,22 +167,22 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
         if ($mixIds) {
             if (\is_array($mixIds)) {
                 $arrReturn['procedure'] .= ' AND item_id IN (' . $this->parameterMask($mixIds) . ')';
-                $arrReturn['params']     = \array_merge($arrReturn['params'], $mixIds);
+                $arrReturn['params']    = \array_merge($arrReturn['params'], $mixIds);
             } else {
                 $arrReturn['procedure'] .= ' AND item_id=?';
-                $arrReturn['params'][]   = $mixIds;
+                $arrReturn['params'][]  = $mixIds;
             }
         }
 
         if (\is_int($intRow) && \is_int($intCol)) {
             $arrReturn['procedure'] .= ' AND row = ? AND col = ?';
-            $arrReturn['params'][]   = $intRow;
-            $arrReturn['params'][]   = $intCol;
+            $arrReturn['params'][]  = $intRow;
+            $arrReturn['params'][]  = $intCol;
         }
 
         if ($strLangCode) {
             $arrReturn['procedure'] .= ' AND langcode=?';
-            $arrReturn['params'][]   = $strLangCode;
+            $arrReturn['params'][]  = $strLangCode;
         }
 
         return $arrReturn;
