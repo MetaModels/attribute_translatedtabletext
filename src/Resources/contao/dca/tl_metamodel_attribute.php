@@ -23,7 +23,13 @@
  */
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['metapalettes']['translatedtabletext extends _complexattribute_'] = [
-    '+advanced' => ['tabletext_quantity_cols', 'translatedtabletext_cols'],
+    '+advanced' => [
+        'tabletext_quantity_cols',
+        'translatedtabletext_cols',
+        'translatedtabletext_minCount',
+        'translatedtabletext_maxCount',
+        'translatedtabletext_disable_sorting'
+    ],
 ];
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['dca_config']['data_provider']['tl_metamodel_translatedtabletext'] = [
@@ -109,4 +115,28 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['translatedtabletext_cols
         ],
     ],
     'sql'       => 'blob NULL'
+];
+
+$GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['translatedtabletext_minCount'] = [
+    'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['translatedtabletext_minCount'],
+    'exclude'   => true,
+    'inputType' => 'text',
+    'eval'      => ['rgxp' => 'natural', 'maxlength' => 255, 'tl_class' => 'clr w50'],
+    'sql'       => 'smallint(5) NOT NULL default \'0\''
+];
+
+$GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['translatedtabletext_maxCount'] = [
+    'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['translatedtabletext_maxCount'],
+    'exclude'   => true,
+    'inputType' => 'text',
+    'eval'      => ['rgxp' => 'natural', 'maxlength' => 255, 'tl_class' => 'w50'],
+    'sql'       => 'smallint(5) NOT NULL default \'0\''
+];
+
+$GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['translatedtabletext_disable_sorting'] = [
+    'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['translatedtabletext_disable_sorting'],
+    'exclude'   => true,
+    'inputType' => 'checkbox',
+    'eval'      => ['tl_class' => 'clr w50 cbx m12'],
+    'sql'       => 'char(1) NOT NULL default \'\''
 ];
