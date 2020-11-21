@@ -273,7 +273,7 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
 
         foreach ($arrIds as $intId) {
             // Walk every row.
-            foreach ($arrValues[$intId] as $row) {
+            foreach ((array) $arrValues[$intId] as $row) {
                 // Walk every column and insert the value.
                 foreach ($row as $cell) {
                     if (empty($cell['value'])) {
