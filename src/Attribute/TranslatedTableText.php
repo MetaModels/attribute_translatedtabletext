@@ -166,22 +166,22 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
         if ($mixIds) {
             if (\is_array($mixIds)) {
                 $arrReturn['procedure'] .= ' AND item_id IN (' . $this->parameterMask($mixIds) . ')';
-                $arrReturn['params']    = \array_merge($arrReturn['params'], $mixIds);
+                $arrReturn['params']     = \array_merge($arrReturn['params'], $mixIds);
             } else {
                 $arrReturn['procedure'] .= ' AND item_id=?';
-                $arrReturn['params'][]  = $mixIds;
+                $arrReturn['params'][]   = $mixIds;
             }
         }
 
         if (\is_int($intRow) && \is_int($intCol)) {
             $arrReturn['procedure'] .= ' AND row = ? AND col = ?';
-            $arrReturn['params'][]  = $intRow;
-            $arrReturn['params'][]  = $intCol;
+            $arrReturn['params'][]   = $intRow;
+            $arrReturn['params'][]   = $intCol;
         }
 
         if ($strLangCode) {
             $arrReturn['procedure'] .= ' AND langcode=?';
-            $arrReturn['params'][]  = $strLangCode;
+            $arrReturn['params'][]   = $strLangCode;
         }
 
         return $arrReturn;
