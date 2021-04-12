@@ -3,3 +3,8 @@ ignore:
 
 exclude:
   - /^src\/Resources\/contao\/languages/
+
+mapping:
+  'Ingolf Steinhardt <info@e-spin.de>':
+    - 'zonky <info@e-spin.de>'
+    - 'zonky2 <info@e-spin.de>'
