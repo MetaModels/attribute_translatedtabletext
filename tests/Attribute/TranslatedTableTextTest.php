@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_translatedtabletext.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2021 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,7 +12,8 @@
  *
  * @package    MetaModels/attribute_translatedtabletext
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
- * @copyright  2012-2019 The MetaModels team.
+ * @author     Sven Baumann <baumann.sv@gmail.com>
+ * @copyright  2012-2021 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_translatedtabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -22,10 +23,13 @@ namespace MetaModels\AttributeTranslatedTableTextBundle\Test\Attribute;
 use MetaModels\AttributeTranslatedTableTextBundle\Attribute\TranslatedTableText;
 use MetaModels\AttributeTranslatedTableTextBundle\DatabaseAccessor;
 use MetaModels\IMetaModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Unit tests to test class GeoProtection.
+ *
+ * @covers \MetaModels\AttributeTranslatedTableTextBundle\Attribute\TranslatedTableText
  */
 class TranslatedTableTextTest extends TestCase
 {
@@ -60,7 +64,7 @@ class TranslatedTableTextTest extends TestCase
     /**
      * Mock the database connection.
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|DatabaseAccessor
+     * @return MockObject|DatabaseAccessor
      */
     private function mockAccessor(): DatabaseAccessor
     {
@@ -81,7 +85,7 @@ class TranslatedTableTextTest extends TestCase
             [],
             $this->mockAccessor()
         );
-        $this->assertInstanceOf(TranslatedTableText::class, $text);
+        self::assertInstanceOf(TranslatedTableText::class, $text);
     }
 
     /**
@@ -98,10 +102,10 @@ class TranslatedTableTextTest extends TestCase
             $accessor
         );
 
-        $accessor->expects($this->once())->method('removeDataForIds')->with(42, [21], 'en');
+        $accessor->expects(self::once())->method('removeDataForIds')->with(42, [21], 'en');
 
         $accessor
-            ->expects($this->exactly(5))
+            ->expects(self::exactly(5))
             ->method('setDataRow')
             ->withConsecutive(
                 [42, 21, 'en', 0, 0, '1'],
@@ -153,7 +157,7 @@ class TranslatedTableTextTest extends TestCase
         );
 
         $accessor
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('fetchDataFor')
             ->with(42, [21], 'en', 3)
             ->willReturn($data = [21 => [
@@ -174,7 +178,7 @@ class TranslatedTableTextTest extends TestCase
                 ]
             ]]);
 
-        $this->assertSame($data, $attribute->getTranslatedDataFor([21], 'en'));
+        self::assertSame($data, $attribute->getTranslatedDataFor([21], 'en'));
     }
 
     /**
@@ -195,7 +199,7 @@ class TranslatedTableTextTest extends TestCase
         );
 
         $accessor
-            ->expects($this->exactly(2))
+            ->expects(self::exactly(2))
             ->method('fetchDataFor')
             ->withConsecutive([42, [21, 23], 'de', 1], [42, [23], 'en', 1])
             ->willReturnOnConsecutiveCalls(
@@ -211,7 +215,7 @@ class TranslatedTableTextTest extends TestCase
                 ]]
             );
 
-        $this->assertSame(
+        self::assertSame(
             [
                 21 => [
                     0 => [$this->langRow(1, '1', '42', 0, 0, 21, 'de')],
@@ -246,7 +250,7 @@ class TranslatedTableTextTest extends TestCase
             $this->mockAccessor()
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 0 => ['col_0' => '1', 'col_1' => '2', 'col_2' => '3'],
                 1 => ['col_0' => '',  'col_1' => '',  'col_2' => ''],
