@@ -76,13 +76,13 @@ class DatabaseAccessorTest extends TestCase
             ->expects(self::once())
             ->method('values')
             ->with([
-                'tstamp'   => ':tstamp',
-                'value'    => ':value',
-                'att_id'   => ':att_id',
-                'row'      => ':row',
-                'col'      => ':col',
-                'item_id'  => ':item_id',
-                'langcode' => ':langcode',
+                'tl_metamodel_translatedtabletext.tstamp'   => ':tstamp',
+                'tl_metamodel_translatedtabletext.value'    => ':value',
+                'tl_metamodel_translatedtabletext.att_id'   => ':att_id',
+                'tl_metamodel_translatedtabletext.row'      => ':row',
+                'tl_metamodel_translatedtabletext.col'      => ':col',
+                'tl_metamodel_translatedtabletext.item_id'  => ':item_id',
+                'tl_metamodel_translatedtabletext.langcode' => ':langcode',
             ])
             ->willReturn($insertBuilder);
         $insertBuilder
@@ -130,9 +130,9 @@ class DatabaseAccessorTest extends TestCase
             ->expects(self::exactly(3))
             ->method('andWhere')
             ->withConsecutive(
-                ['att_id=:att_id'],
-                ['item_id IN (:item_ids)'],
-                ['langcode=:langcode']
+                ['tl_metamodel_translatedtabletext.att_id=:att_id'],
+                ['tl_metamodel_translatedtabletext.item_id IN (:item_ids)'],
+                ['tl_metamodel_translatedtabletext.langcode=:langcode']
             )
             ->willReturn($deleteBuilder);
         $deleteBuilder
@@ -180,20 +180,20 @@ class DatabaseAccessorTest extends TestCase
         $queryBuilder
             ->expects(self::once())
             ->method('orderBy')
-            ->with('item_id', 'ASC')
+            ->with('t.item_id', 'ASC')
             ->willReturn($queryBuilder);
         $queryBuilder
             ->expects(self::exactly(2))
             ->method('addOrderBy')
-            ->withConsecutive(['row', 'ASC'], ['col', 'ASC'])
+            ->withConsecutive(['t.row', 'ASC'], ['t.col', 'ASC'])
             ->willReturn($queryBuilder);
         $queryBuilder
             ->expects(self::exactly(3))
             ->method('andWhere')
             ->withConsecutive(
-                ['att_id=:att_id'],
-                ['item_id IN (:item_ids)'],
-                ['langcode=:langcode']
+                ['t.att_id=:att_id'],
+                ['t.item_id IN (:item_ids)'],
+                ['t.langcode=:langcode']
             )
             ->willReturn($queryBuilder);
         $queryBuilder
