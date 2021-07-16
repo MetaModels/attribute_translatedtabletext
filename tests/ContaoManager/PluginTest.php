@@ -29,6 +29,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Unit tests the contao manager plugin.
+ *
+ * @covers \MetaModels\AttributeTranslatedTableTextBundle\ContaoManager\Plugin
  */
 class PluginTest extends TestCase
 {

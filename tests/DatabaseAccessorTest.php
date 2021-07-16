@@ -27,6 +27,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Unit tests to test class GeoProtection.
+ *
+ * @covers \MetaModels\AttributeTranslatedTableTextBundle\DatabaseAccessor
  */
 class DatabaseAccessorTest extends TestCase
 {

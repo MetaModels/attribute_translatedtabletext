@@ -29,6 +29,8 @@ use MetaModels\AttributeTranslatedTableTextBundle\Attribute\TranslatedTableText;
 
 /**
  * Test the attribute factory.
+ *
+ * @covers \MetaModels\AttributeTranslatedTableTextBundle\Attribute\AttributeTypeFactory
  */
 class AttributeTypeFactoryTest extends TestCase
 {
