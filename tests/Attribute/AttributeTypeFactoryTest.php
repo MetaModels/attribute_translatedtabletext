@@ -77,7 +77,7 @@ class AttributeTypeFactoryTest extends TestCase
     }
 
     /**
-     * Test creation of an translated select.
+     * Test creation of a translated select.
      *
      * @return void
      */

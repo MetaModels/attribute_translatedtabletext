@@ -24,6 +24,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
  * This is the bundle class.
+ *
+ * @SuppressWarnings(PHPMD.LongClassName)
  */
 class MetaModelsAttributeTranslatedTableTextBundle extends Bundle
 {
