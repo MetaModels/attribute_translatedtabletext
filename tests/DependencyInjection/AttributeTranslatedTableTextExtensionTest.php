@@ -31,6 +31,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * This test case test the extension.
+ *
+ * @covers \MetaModels\AttributeTranslatedTableTextBundle\DependencyInjection\MetaModelsAttributeTranslatedTableTextExtension
  */
 class AttributeTranslatedTableTextExtensionTest extends TestCase
 {
