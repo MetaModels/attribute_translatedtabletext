@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_translatedtabletext.
  *
- * (c) 2012-2021 The MetaModels team.
+ * (c) 2012-2022 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -18,13 +18,14 @@
  * @author     Sven Baumann <baumann.sv@gmail.com>
  * @author     David Molineus <david.molineus@netzmacht.de>
  * @author     Ingolf Steinhardt <info@e-spin.de>
- * @copyright  2012-2021 The MetaModels team.
+ * @copyright  2012-2022 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_translatedtabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
 namespace MetaModels\AttributeTranslatedTableTextBundle\EventListener\DcGeneral\Table;
 
+use Contao\StringUtil;
 use ContaoCommunityAlliance\Contao\Bindings\ContaoEvents;
 use ContaoCommunityAlliance\Contao\Bindings\Events\System\LoadLanguageFileEvent;
 use ContaoCommunityAlliance\DcGeneral\Contao\RequestScopeDeterminator;
@@ -33,6 +34,7 @@ use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\Build
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\DecodePropertyValueForWidgetEvent;
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\EncodePropertyValueFromWidgetEvent;
 use MetaModels\IFactory;
+use MetaModels\ITranslatedMetaModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -114,7 +116,7 @@ class BackendTableListener
             return;
         }
 
-        $attribute = $objMetaModel->getAttributeById($model->getProperty('id'));
+        $attribute = $objMetaModel->getAttributeById((int) $model->getProperty('id'));
         $arrValues = $attribute ? $attribute->get('name') : [];
 
         $languageEvent = new LoadLanguageFileEvent('languages');
@@ -195,8 +197,7 @@ class BackendTableListener
         }
 
         $metaModelName = $this->factory->translateIdToMetaModelName($event->getModel()->getProperty('pid'));
-        $objMetaModel  = $this->factory->getMetaModel($metaModelName);
-        $arrLanguages  = $objMetaModel->getAvailableLanguages();
+        $metaModel     = $this->factory->getMetaModel($metaModelName);
 
         // Check model and input for the cols and get the max value.
         $intModelCols = $event->getModel()->getProperty('tabletext_quantity_cols');
@@ -212,8 +213,8 @@ class BackendTableListener
             }
         }
 
-        $arrLangValues = \deserialize($varValue);
-        if (!$objMetaModel->isTranslated()) {
+        $arrLangValues = StringUtil::deserialize($varValue);
+        if (!($metaModel instanceof ITranslatedMetaModel) && !$metaModel->isTranslated(false)) {
             // If we have an array, return the first value and exit, if not an array, return the value itself.
             if (\is_array($arrLangValues)) {
                 $event->setValue($arrLangValues[\key($arrLangValues)]);
@@ -224,12 +225,14 @@ class BackendTableListener
             return;
         }
 
-        $arrOutput = [];
         // Sort like in MetaModel definition.
+        $arrLanguages  = $metaModel->getAvailableLanguages();
+        $arrOutput     = [];
+
         if ($arrLanguages) {
             foreach ($arrLanguages as $strLangCode) {
                 if (\is_array($arrLangValues)) {
-                    $varSubValue = $arrLangValues[$strLangCode];
+                    $varSubValue = $arrLangValues[$strLangCode] ?? '';
                 } else {
                     $varSubValue = $arrLangValues;
                 }
