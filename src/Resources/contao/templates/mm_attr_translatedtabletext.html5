@@ -1,18 +1,14 @@
 <?php
-$strFallbackLang = $this->attribute->getMetaModel()->getFallbackLanguage();
-$strActiveLang   = $this->attribute->getMetaModel()->getActiveLanguage();
-$strActiveLang   = array_key_exists($strActiveLang, $this->attribute->getMetaModel()->get('languages'))
-    ? $strActiveLang
-    : $strFallbackLang;
+$activeLang = $this->attribute->getMetaModel()->getActiveLanguage();
+$countCol   = count(($this->attribute->get('translatedtabletext_cols')[$activeLang]) ?? []);
 ?>
 <table class="tabletext<?= $this->additional_class; ?>">
-    <?php $countCol = count($this->attribute->get('translatedtabletext_cols')[$strFallbackLang]);
-    if (!$this->settings->get('translatedtabletext_hide_tablehead')) : ?>
+    <?php if (!$this->settings->get('translatedtabletext_hide_tablehead')) : ?>
         <thead>
         <tr>
             <?php foreach (
-                is_array($this->attribute->get('translatedtabletext_cols')[$strActiveLang])
-                    ? $this->attribute->get('translatedtabletext_cols')[$strActiveLang]
+                is_array($this->attribute->get('translatedtabletext_cols')[$activeLang])
+                    ? $this->attribute->get('translatedtabletext_cols')[$activeLang]
                     : [] as $headCol
             ) : ?>
                 <th><?= $headCol['rowLabel'] ?></th>
