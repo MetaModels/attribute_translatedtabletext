@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_translatedtabletext.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2021 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,7 +14,7 @@
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
  * @author     Sven Baumann <baumann.sv@gmail.com>
- * @copyright  2012-2019 The MetaModels team.
+ * @copyright  2012-2021 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_translatedtabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -24,11 +24,14 @@ namespace MetaModels\AttributeTranslatedTableTextBundle\Test\Attribute;
 use MetaModels\AttributeTranslatedTableTextBundle\Attribute\AttributeTypeFactory;
 use MetaModels\AttributeTranslatedTableTextBundle\DatabaseAccessor;
 use MetaModels\IMetaModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use MetaModels\AttributeTranslatedTableTextBundle\Attribute\TranslatedTableText;
 
 /**
  * Test the attribute factory.
+ *
+ * @covers \MetaModels\AttributeTranslatedTableTextBundle\Attribute\AttributeTypeFactory
  */
 class AttributeTypeFactoryTest extends TestCase
 {
@@ -65,7 +68,7 @@ class AttributeTypeFactoryTest extends TestCase
     /**
      * Mock the database connection.
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|DatabaseAccessor
+     * @return MockObject|DatabaseAccessor
      */
     private function mockAccessor()
     {
@@ -103,10 +106,10 @@ class AttributeTypeFactoryTest extends TestCase
         $check                             = $values;
         $check['translatedtabletext_cols'] = \unserialize($check['translatedtabletext_cols']);
 
-        $this->assertInstanceOf(TranslatedTableText::class, $attribute);
+        self::assertInstanceOf(TranslatedTableText::class, $attribute);
 
         foreach ($check as $key => $value) {
-            $this->assertEquals($value, $attribute->get($key), $key);
+            self::assertEquals($value, $attribute->get($key), $key);
         }
     }
 }

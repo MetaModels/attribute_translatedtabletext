@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_translatedtabletext.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2021 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -19,7 +19,7 @@
  * @author     Ingolf Steinhardt <info@e-spin.de>
  * @author     David Molineus <david.molineus@netzmacht.de>
  * @author     Sven Baumann <baumann.sv@gmail.com>
- * @copyright  2012-2019 The MetaModels team.
+ * @copyright  2012-2021 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_translatedtabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -84,6 +84,9 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
             [
                 'translatedtabletext_cols',
                 'tabletext_quantity_cols',
+                'translatedtabletext_minCount',
+                'translatedtabletext_maxCount',
+                'translatedtabletext_disable_sorting'
             ]
         );
     }
@@ -96,7 +99,6 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
         $strActiveLanguage   = $this->getMetaModel()->getActiveLanguage();
         $strFallbackLanguage = $this->getMetaModel()->getFallbackLanguage();
         $arrAllColLabels     = StringUtil::deserialize($this->get('translatedtabletext_cols'), true);
-        $arrColLabels        = null;
 
         if (\array_key_exists($strActiveLanguage, $arrAllColLabels)) {
             $arrColLabels = $arrAllColLabels[$strActiveLanguage];
@@ -107,8 +109,19 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
         }
 
         // Build DCA.
-        $arrFieldDef                         = parent::getFieldDefinition($arrOverrides);
-        $arrFieldDef['inputType']            = 'multiColumnWizard';
+        $arrFieldDef                     = parent::getFieldDefinition($arrOverrides);
+        $arrFieldDef['inputType']        = 'multiColumnWizard';
+        $arrFieldDef['eval']['minCount'] = $this->get('translatedtabletext_minCount') ?: '0';
+        $arrFieldDef['eval']['maxCount'] = $this->get('translatedtabletext_maxCount') ?: '0';
+
+        if ($this->get('translatedtabletext_disable_sorting')) {
+            $arrFieldDef['eval']['buttons'] = [
+                'move' => false,
+                'up'   => false,
+                'down' => false
+            ];
+        }
+
         $arrFieldDef['eval']['columnFields'] = [];
 
         $countCol = \count($arrColLabels);
@@ -186,11 +199,11 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
         $countCol    = $this->get('tabletext_quantity_cols');
         $widgetValue = [];
 
-        foreach ($varValue as $k => $row) {
-            for ($kk = 0; $kk < $countCol; $kk++) {
-                $i = \array_search($kk, \array_column($row, 'col'));
+        foreach ($varValue as $key => $row) {
+            for ($kkey = 0; $kkey < $countCol; $kkey++) {
+                $index = \array_search($kkey, \array_column($row, 'col'));
 
-                $widgetValue[$k]['col_' . $kk] = ($i !== false) ? $row[$i]['value'] : '';
+                $widgetValue[$key]['col_' . $kkey] = ($index !== false) ? $row[$index]['value'] : '';
             }
         }
 
@@ -259,7 +272,7 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
 
         foreach ($arrIds as $intId) {
             // Walk every row.
-            foreach ($arrValues[$intId] as $row) {
+            foreach ((array) $arrValues[$intId] as $row) {
                 // Walk every column and insert the value.
                 foreach ($row as $cell) {
                     if (empty($cell['value'])) {

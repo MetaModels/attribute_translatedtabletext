@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_translatedtabletext.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2021 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,7 +12,8 @@
  *
  * @package    MetaModels/attribute_translatedtabletext
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
- * @copyright  2012-2019 The MetaModels team.
+ * @author     Sven Baumann <baumann.sv@gmail.com>
+ * @copyright  2012-2021 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_translatedtabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -23,17 +24,20 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Query\QueryBuilder;
 use MetaModels\AttributeTranslatedTableTextBundle\DatabaseAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Unit tests to test class GeoProtection.
+ *
+ * @covers \MetaModels\AttributeTranslatedTableTextBundle\DatabaseAccessor
  */
 class DatabaseAccessorTest extends TestCase
 {
     /**
      * Mock the database connection.
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|Connection
+     * @return MockObject|Connection
      */
     private function mockConnection()
     {
@@ -48,7 +52,7 @@ class DatabaseAccessorTest extends TestCase
      */
     public function testInstantiation(): void
     {
-        $this->assertInstanceOf(DatabaseAccessor::class, new DatabaseAccessor($this->mockConnection()));
+        self::assertInstanceOf(DatabaseAccessor::class, new DatabaseAccessor($this->mockConnection()));
     }
 
     /**
@@ -64,25 +68,25 @@ class DatabaseAccessorTest extends TestCase
             ->getMock();
 
         $insertBuilder
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('insert')
             ->with('tl_metamodel_translatedtabletext')
             ->willReturn($insertBuilder);
         $insertBuilder
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('values')
             ->with([
-                'tstamp'   => ':tstamp',
-                'value'    => ':value',
-                'att_id'   => ':att_id',
-                'row'      => ':row',
-                'col'      => ':col',
-                'item_id'  => ':item_id',
-                'langcode' => ':langcode',
+                'tl_metamodel_translatedtabletext.tstamp'   => ':tstamp',
+                'tl_metamodel_translatedtabletext.value'    => ':value',
+                'tl_metamodel_translatedtabletext.att_id'   => ':att_id',
+                'tl_metamodel_translatedtabletext.row'      => ':row',
+                'tl_metamodel_translatedtabletext.col'      => ':col',
+                'tl_metamodel_translatedtabletext.item_id'  => ':item_id',
+                'tl_metamodel_translatedtabletext.langcode' => ':langcode',
             ])
             ->willReturn($insertBuilder);
         $insertBuilder
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('setParameters')
             ->with([
                 'tstamp'   => \time(),
@@ -95,11 +99,11 @@ class DatabaseAccessorTest extends TestCase
             ])
             ->willReturn($insertBuilder);
         $insertBuilder
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('execute');
 
         $connection = $this->mockConnection();
-        $connection->expects($this->once())->method('createQueryBuilder')->willReturn($insertBuilder);
+        $connection->expects(self::once())->method('createQueryBuilder')->willReturn($insertBuilder);
 
         $accessor = new DatabaseAccessor($connection);
         $accessor->setDataRow(42, 21, 'en', 0, 0, 'value');
@@ -118,21 +122,21 @@ class DatabaseAccessorTest extends TestCase
             ->getMock();
 
         $deleteBuilder
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('delete')
             ->with('tl_metamodel_translatedtabletext')
             ->willReturn($deleteBuilder);
         $deleteBuilder
-            ->expects($this->exactly(3))
+            ->expects(self::exactly(3))
             ->method('andWhere')
             ->withConsecutive(
-                ['att_id=:att_id'],
-                ['item_id IN (:item_ids)'],
-                ['langcode=:langcode']
+                ['tl_metamodel_translatedtabletext.att_id=:att_id'],
+                ['tl_metamodel_translatedtabletext.item_id IN (:item_ids)'],
+                ['tl_metamodel_translatedtabletext.langcode=:langcode']
             )
             ->willReturn($deleteBuilder);
         $deleteBuilder
-            ->expects($this->exactly(3))
+            ->expects(self::exactly(3))
             ->method('setParameter')
             ->withConsecutive(
                 ['att_id', 42],
@@ -142,7 +146,7 @@ class DatabaseAccessorTest extends TestCase
             ->willReturn($deleteBuilder);
 
         $connection = $this->mockConnection();
-        $connection->expects($this->once())->method('createQueryBuilder')->willReturn($deleteBuilder);
+        $connection->expects(self::once())->method('createQueryBuilder')->willReturn($deleteBuilder);
 
         $accessor = new DatabaseAccessor($connection);
         $accessor->removeDataForIds(42, [21], 'en');
@@ -161,39 +165,39 @@ class DatabaseAccessorTest extends TestCase
             ->getMock();
 
         $connection = $this->mockConnection();
-        $connection->expects($this->once())->method('createQueryBuilder')->willReturn($queryBuilder);
+        $connection->expects(self::once())->method('createQueryBuilder')->willReturn($queryBuilder);
 
         $queryBuilder
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('select')
             ->with('*')
             ->willReturn($queryBuilder);
         $queryBuilder
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('from')
             ->with('tl_metamodel_translatedtabletext')
             ->willReturn($queryBuilder);
         $queryBuilder
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('orderBy')
-            ->with('item_id', 'ASC')
+            ->with('t.item_id', 'ASC')
             ->willReturn($queryBuilder);
         $queryBuilder
-            ->expects($this->exactly(2))
+            ->expects(self::exactly(2))
             ->method('addOrderBy')
-            ->withConsecutive(['row', 'ASC'], ['col', 'ASC'])
+            ->withConsecutive(['t.row', 'ASC'], ['t.col', 'ASC'])
             ->willReturn($queryBuilder);
         $queryBuilder
-            ->expects($this->exactly(3))
+            ->expects(self::exactly(3))
             ->method('andWhere')
             ->withConsecutive(
-                ['att_id=:att_id'],
-                ['item_id IN (:item_ids)'],
-                ['langcode=:langcode']
+                ['t.att_id=:att_id'],
+                ['t.item_id IN (:item_ids)'],
+                ['t.langcode=:langcode']
             )
             ->willReturn($queryBuilder);
         $queryBuilder
-            ->expects($this->exactly(3))
+            ->expects(self::exactly(3))
             ->method('setParameter')
             ->withConsecutive(
                 ['att_id', 42],
@@ -204,12 +208,12 @@ class DatabaseAccessorTest extends TestCase
 
         $mockResult = $this->getMockBuilder(Statement::class)->disableOriginalConstructor()->getMock();
         $queryBuilder
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('execute')
             ->willReturn($mockResult);
 
         $mockResult
-            ->expects($this->exactly(6))
+            ->expects(self::exactly(6))
             ->method('fetch')
             ->willReturnOnConsecutiveCalls(
                 $this->langRow(1, '1', '42', 0, 0, 21, 'en'),
@@ -221,7 +225,7 @@ class DatabaseAccessorTest extends TestCase
             );
 
         $accessor = new DatabaseAccessor($connection);
-        $this->assertSame(
+        self::assertSame(
             [21 => [
                 0 => [
                     $this->langRow(1, '1', '42', 0, 0, 21, 'en'),
