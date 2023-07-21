@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_translatedtabletext.
  *
- * (c) 2012-2021 The MetaModels team.
+ * (c) 2012-2023 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -19,7 +19,7 @@
  * @author     Ingolf Steinhardt <info@e-spin.de>
  * @author     David Molineus <david.molineus@netzmacht.de>
  * @author     Sven Baumann <baumann.sv@gmail.com>
- * @copyright  2012-2021 The MetaModels team.
+ * @copyright  2012-2023 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_translatedtabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -122,16 +122,27 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
             ];
         }
 
+        if (!empty($arrFieldDef['eval']['readonly'])) {
+            $arrFieldDef['eval']['hideButtons'] = true;
+        }
+
         $arrFieldDef['eval']['columnFields'] = [];
 
         $countCol = \count($arrColLabels);
         for ($i = 0; $i < $countCol; $i++) {
+            // Init columnField.
             $arrFieldDef['eval']['columnFields']['col_' . $i] = [
                 'label'     => $arrColLabels[$i]['rowLabel'],
                 'inputType' => 'text',
                 'eval'      => [],
             ];
 
+            // Add readonly.
+            if (!empty($arrFieldDef['eval']['readonly'])) {
+                $arrFieldDef['eval']['columnFields']['col_' . $i]['eval']['readonly'] = true;
+            }
+
+            // Add style.
             if ($arrColLabels[$i]['rowStyle']) {
                 $arrFieldDef['eval']['columnFields']['col_' . $i]['eval']['style'] =
                     'width:' . $arrColLabels[$i]['rowStyle'];
