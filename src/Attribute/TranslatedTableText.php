@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_translatedtabletext.
  *
- * (c) 2012-2023 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -19,7 +19,7 @@
  * @author     Ingolf Steinhardt <info@e-spin.de>
  * @author     David Molineus <david.molineus@netzmacht.de>
  * @author     Sven Baumann <baumann.sv@gmail.com>
- * @copyright  2012-2023 The MetaModels team.
+ * @copyright  2012-2024 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_translatedtabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -36,6 +36,9 @@ use MetaModels\Attribute\ITranslated;
 
 /**
  * This is the MetaModelAttribute class for handling translated table text fields.
+ *
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.NPathComplexity)
  */
 class TranslatedTableText extends Base implements ITranslated, IComplex
 {
@@ -44,18 +47,19 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
      *
      * @var DatabaseAccessor
      */
-    private $accessor;
+    private DatabaseAccessor $accessor;
 
     /**
      * Instantiate an MetaModel attribute.
      *
      * Note that you should not use this directly but use the factory classes to instantiate attributes.
      *
-     * @param IMetaModel       $objMetaModel The MetaModel instance this attribute belongs to.
-     * @param array            $arrData      The information array, for attribute information, refer to documentation of
-     *                                       table tl_metamodel_attribute and documentation of the certain attribute
-     *                                       classes for information what values are understood.
-     * @param DatabaseAccessor $accessor     Database connection.
+     * @param IMetaModel            $objMetaModel The MetaModel instance this attribute belongs to.
+     * @param array                 $arrData      The information array, for attribute information, refer to
+     *                                            documentation of table tl_metamodel_attribute and documentation of
+     *                                            the certain attribute classes for information what values are
+     *                                            understood.
+     * @param DatabaseAccessor|null $accessor     Database connection.
      */
     public function __construct(IMetaModel $objMetaModel, array $arrData = [], DatabaseAccessor $accessor = null)
     {
@@ -63,14 +67,14 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
 
         if (null === $accessor) {
             // @codingStandardsIgnoreStart
-            @\trigger_error(
-                'DatabaseAccessor is missing. It has to be passed in the constructor. Fallback will be dropped.',
+            @trigger_error(
+                'Connection is missing. It has to be passed in the constructor. Fallback will be dropped.',
                 E_USER_DEPRECATED
             );
             // @codingStandardsIgnoreEnd
             $accessor = new DatabaseAccessor(System::getContainer()->get('database_connection'));
+            assert($accessor instanceof DatabaseAccessor);
         }
-
         $this->accessor = $accessor;
     }
 
@@ -96,7 +100,9 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
      */
     public function getFieldDefinition($arrOverrides = [])
     {
-        $strActiveLanguage   = $this->getMetaModel()->getActiveLanguage();
+        /** @psalm-suppress DeprecatedMethod */
+        $strActiveLanguage = $this->getMetaModel()->getActiveLanguage();
+        /** @psalm-suppress DeprecatedMethod */
         $strFallbackLanguage = $this->getMetaModel()->getFallbackLanguage();
         $arrAllColLabels     = StringUtil::deserialize($this->get('translatedtabletext_cols'), true);
 
@@ -156,11 +162,8 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
      * Build a where clause for the given id(s) and rows/cols.
      *
      * @param mixed  $mixIds      One, none or many ids to use.
-     *
      * @param string $strLangCode The language code, optional.
-     *
      * @param int    $intRow      The row number, optional.
-     *
      * @param int    $intCol      The col number, optional.
      *
      * @return array
@@ -328,6 +331,7 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
      */
     public function setDataFor($arrValues)
     {
+        /** @psalm-suppress DeprecatedMethod */
         $this->setTranslatedDataFor($arrValues, $this->getMetaModel()->getActiveLanguage());
     }
 
@@ -336,13 +340,15 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
      */
     public function getDataFor($arrIds)
     {
-        $strActiveLanguage   = $this->getMetaModel()->getActiveLanguage();
+        /** @psalm-suppress DeprecatedMethod */
+        $strActiveLanguage = $this->getMetaModel()->getActiveLanguage();
+        /** @psalm-suppress DeprecatedMethod */
         $strFallbackLanguage = $this->getMetaModel()->getFallbackLanguage();
 
         $arrReturn = $this->getTranslatedDataFor($arrIds, $strActiveLanguage);
 
         // Second round, fetch fallback languages if not all items could be resolved.
-        if ((\count($arrReturn) < \count($arrIds)) && ($strActiveLanguage != $strFallbackLanguage)) {
+        if ((\count($arrReturn) < \count($arrIds)) && ($strActiveLanguage !== $strFallbackLanguage)) {
             $arrFallbackIds = [];
             foreach ($arrIds as $intId) {
                 if (empty($arrReturn[$intId])) {

@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_translatedtabletext.
  *
- * (c) 2012-2022 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,13 +13,14 @@
  * @package    MetaModels/attribute_translatedtabletext
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Ingolf Steinhardt <info@e-spin.de>
- * @copyright  2012-2022 The MetaModels team.
+ * @copyright  2012-2024 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_translatedtabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
 namespace MetaModels\AttributeTranslatedTableTextBundle;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 
 /**
@@ -32,7 +33,7 @@ class DatabaseAccessor
      *
      * @var Connection
      */
-    private $connection;
+    private Connection $connection;
 
     /**
      * Create a new instance.
@@ -92,9 +93,9 @@ class DatabaseAccessor
     /**
      * Remove all rows for the passed id list.
      *
-     * @param string $attributeId The attribute id for which to unset.
-     * @param array  $idsList     The id list for which to unset.
-     * @param string $language    The language for which to unset (optional, null means all languages).
+     * @param string      $attributeId The attribute id for which to unset.
+     * @param array       $idsList     The id list for which to unset.
+     * @param string|null $language    The language for which to unset (optional, null means all languages).
      *
      * @return void
      */
@@ -106,7 +107,7 @@ class DatabaseAccessor
             ->setParameter('att_id', $attributeId);
         $queryBuilder
             ->andWhere('tl_metamodel_translatedtabletext.item_id IN (:item_ids)')
-            ->setParameter('item_ids', $idsList, Connection::PARAM_STR_ARRAY);
+            ->setParameter('item_ids', $idsList, ArrayParameterType::STRING);
         if (null !== $language) {
             $queryBuilder
                 ->andWhere('tl_metamodel_translatedtabletext.langcode=:langcode')
@@ -140,7 +141,7 @@ class DatabaseAccessor
             ->setParameter('att_id', $attributeId);
         $queryBuilder
             ->andWhere('t.item_id IN (:item_ids)')
-            ->setParameter('item_ids', $idsList, Connection::PARAM_STR_ARRAY);
+            ->setParameter('item_ids', $idsList, ArrayParameterType::STRING);
         $queryBuilder
             ->andWhere('t.langcode=:langcode')
             ->setParameter('langcode', $language);
@@ -166,9 +167,14 @@ class DatabaseAccessor
      *
      * @return void
      */
-    private function pushValue(string $attributeId, $value, &$result, $countCol, $languageCode)
-    {
-        $buildRow = function (&$list, $itemId, $row) use ($countCol, $languageCode, $attributeId) {
+    private function pushValue(
+        string $attributeId,
+        array $value,
+        array &$result,
+        int $countCol,
+        string $languageCode
+    ): void {
+        $buildRow = static function (&$list, $itemId, $row) use ($countCol, $languageCode, $attributeId) {
             for ($i = \count($list); $i < $countCol; $i++) {
                 $list[$i] = [
                     'tstamp'   => 0,
