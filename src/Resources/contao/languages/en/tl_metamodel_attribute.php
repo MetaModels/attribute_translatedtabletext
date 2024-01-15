@@ -25,7 +25,10 @@
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['typeOptions']['translatedtabletext']  = 'Translated table text';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tabletext_cols']                      =
     ['Column config', 'Please enter a label and width for each column.'];
-$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tabletext_rowLabels']                 = [''];
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tabletext_langcode']                  =
+    ['Language code', 'Please enter the language code for the columns'];
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tabletext_rowLabels']                 =
+    ['Labels', ''];
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tabletext_rowLabel']                  =
     ['Label', 'Please enter the labels for the columns'];
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tabletext_rowStyle']                  =
