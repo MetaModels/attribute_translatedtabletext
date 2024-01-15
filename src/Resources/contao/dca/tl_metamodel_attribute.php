@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_translatedtabletext.
  *
- * (c) 2012-2020 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -17,7 +17,7 @@
  * @author     Sven Baumann <baumann.sv@gmail.com>
  * @author     David Molineus <david.molineus@netzmacht.de>
  * @author     Ingolf Steinhardt <info@e-spin.de>
- * @copyright  2012-2020 The MetaModels team.
+ * @copyright  2012-2024 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_translatedtabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -78,6 +78,7 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['translatedtabletext_cols
         'tl_class'       => 'clr w50',
         'columnFields'   => [
             'langcode'  => [
+                'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tabletext_langcode'],
                 'exclude'   => true,
                 'inputType' => 'justtextoption',
                 'eval'      => [
@@ -86,6 +87,7 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['translatedtabletext_cols
                 ],
             ],
             'rowLabels' => [
+                'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tabletext_rowLabels'],
                 'exclude'   => true,
                 'inputType' => 'multiColumnWizard',
                 'eval'      => [
@@ -94,6 +96,7 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['translatedtabletext_cols
                     'tl_class'       => 'clr',
                     'columnFields'   => [
                         'rowLabel' => [
+                            'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tabletext_rowLabel'],
                             'exclude'   => true,
                             'inputType' => 'text',
                             'eval'      => [
@@ -102,6 +105,7 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['translatedtabletext_cols
                             ],
                         ],
                         'rowStyle' => [
+                            'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tabletext_rowStyle'],
                             'exclude'   => true,
                             'inputType' => 'text',
                             'eval'      => [
