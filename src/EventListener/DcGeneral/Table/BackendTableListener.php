@@ -171,7 +171,7 @@ class BackendTableListener
         $data['columnFields']['langcode']['options']            = $arrLanguages;
         $data['columnFields']['langcode']['eval']['rowClasses'] = $arrRowClasses;
         $data['columnFields']['rowLabels']['label']             = $translator->translate(
-            'tabletext_rowLabels',
+            'tabletext_rowLabels.0',
             'tl_metamodel_attribute'
         );
 
