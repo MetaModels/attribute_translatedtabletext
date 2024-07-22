@@ -94,7 +94,7 @@ class BackendTableListener
      */
     public function fillExtraData(BuildWidgetEvent $event)
     {
-        if (!$this->scopeDeterminator->currentScopeIsBackend()) {
+        if (!$this->scopeDeterminator?->currentScopeIsBackend()) {
             return;
         }
 
@@ -132,7 +132,9 @@ class BackendTableListener
         }
 
         $attribute = $objMetaModel->getAttributeById((int) $model->getProperty('id'));
-        $arrValues = $attribute ? $attribute->get('name') : [];
+        $arrValues = $attribute ? StringUtil::deserialize($attribute->get('name')) : [];
+        assert(\is_array($arrValues));
+        /** @var array<string, string> $arrValues */
 
         $languageEvent = new LoadLanguageFileEvent('languages');
         $this->eventDispatcher->dispatch($languageEvent, ContaoEvents::SYSTEM_LOAD_LANGUAGE_FILE);
@@ -153,7 +155,7 @@ class BackendTableListener
         }
 
         $arrRowClasses = [];
-        foreach (\array_keys(StringUtil::deserialize($arrValues)) as $strLangcode) {
+        foreach (\array_keys($arrValues) as $strLangcode) {
             /** @psalm-suppress DeprecatedMethod */
             $arrRowClasses[] = ($strLangcode === $objMetaModel->getFallbackLanguage())
                 ? 'fallback_language'
@@ -202,7 +204,7 @@ class BackendTableListener
      */
     public function loadValues(DecodePropertyValueForWidgetEvent $event)
     {
-        if (!$this->scopeDeterminator->currentScopeIsBackend()) {
+        if (!$this->scopeDeterminator?->currentScopeIsBackend()) {
             return;
         }
 
@@ -228,8 +230,7 @@ class BackendTableListener
         $intModelCols = $event->getModel()->getProperty('tabletext_quantity_cols');
         $intInputCols = $inputProvider->getValue('tabletext_quantity_cols');
         $intCols      = \max((int) $intModelCols, (int) $intInputCols);
-
-        $varValue = $event->getValue();
+        $varValue     = StringUtil::deserialize($event->getValue());
 
         // Kick unused lines.
         foreach ((array) $varValue as $strLanguage => $arrRows) {
@@ -238,17 +239,16 @@ class BackendTableListener
             }
         }
 
-        $arrLangValues = StringUtil::deserialize($varValue);
         /**
          * @psalm-suppress DeprecatedMethod
          * @psalm-suppress TooManyArguments
          */
         if (!($metaModel instanceof ITranslatedMetaModel) && !$metaModel->isTranslated(false)) {
             // If we have an array, return the first value and exit, if not an array, return the value itself.
-            if (\is_array($arrLangValues)) {
-                $event->setValue($arrLangValues[\key($arrLangValues)]);
+            if (\is_array($varValue)) {
+                $event->setValue($varValue[\key($varValue)]);
             } else {
-                $event->setValue($arrLangValues);
+                $event->setValue($varValue);
             }
 
             return;
@@ -259,12 +259,12 @@ class BackendTableListener
         $arrLanguages  = $metaModel->getAvailableLanguages();
         $arrOutput     = [];
 
-        if ($arrLanguages) {
+        if (null !== $arrLanguages) {
             foreach ($arrLanguages as $strLangCode) {
-                if (\is_array($arrLangValues)) {
-                    $varSubValue = $arrLangValues[$strLangCode] ?? '';
+                if (\is_array($varValue)) {
+                    $varSubValue = $varValue[$strLangCode] ?? '';
                 } else {
-                    $varSubValue = $arrLangValues;
+                    $varSubValue = $varValue;
                 }
 
                 if (\is_array($varSubValue)) {
@@ -287,7 +287,7 @@ class BackendTableListener
      */
     public function saveValues(EncodePropertyValueFromWidgetEvent $event)
     {
-        if (!$this->scopeDeterminator->currentScopeIsBackend()) {
+        if (!$this->scopeDeterminator?->currentScopeIsBackend()) {
             return;
         }
 

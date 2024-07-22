@@ -174,7 +174,15 @@ class DatabaseAccessor
         int $countCol,
         string $languageCode
     ): void {
-        $buildRow = static function (&$list, $itemId, $row) use ($countCol, $languageCode, $attributeId) {
+        $buildRow = static function (
+            array &$list,
+            string $itemId,
+            int $row
+        ) use (
+            $countCol,
+            $languageCode,
+            $attributeId
+        ): void {
             for ($i = \count($list); $i < $countCol; $i++) {
                 $list[$i] = [
                     'tstamp'   => 0,
@@ -188,7 +196,7 @@ class DatabaseAccessor
             }
         };
 
-        $itemId = $value['item_id'];
+        $itemId = (string) $value['item_id'];
         if (!isset($result[$itemId])) {
             $result[$itemId] = [];
         }
@@ -202,6 +210,14 @@ class DatabaseAccessor
             $buildRow($result[$itemId][$row], $itemId, $row);
             $row++;
         }
-        $result[$itemId][(int) $value['row']][(int) $value['col']] = $value;
+        $result[$itemId][(int) $value['row']][(int) $value['col']] = [
+            'tstamp'   => (int) $value['tstamp'],
+            'value'    => (string) $value['value'],
+            'att_id'   => (string) $value['att_id'],
+            'row'      => (int) $value['row'],
+            'col'      => (int) $value['col'],
+            'item_id'  => $itemId,
+            'langcode' => (string) $value['langcode'],
+        ];
     }
 }

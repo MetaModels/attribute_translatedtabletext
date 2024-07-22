@@ -28,17 +28,20 @@ namespace MetaModels\AttributeTranslatedTableTextBundle\Attribute;
 
 use Contao\StringUtil;
 use Contao\System;
+use Doctrine\DBAL\Connection;
 use MetaModels\Attribute\Base;
 use MetaModels\Attribute\IComplex;
 use MetaModels\AttributeTranslatedTableTextBundle\DatabaseAccessor;
 use MetaModels\IMetaModel;
 use MetaModels\Attribute\ITranslated;
+use MetaModels\ITranslatedMetaModel;
 
 /**
  * This is the MetaModelAttribute class for handling translated table text fields.
  *
  * @SuppressWarnings(PHPMD.CyclomaticComplexity)
  * @SuppressWarnings(PHPMD.NPathComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class TranslatedTableText extends Base implements ITranslated, IComplex
 {
@@ -72,8 +75,9 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
                 E_USER_DEPRECATED
             );
             // @codingStandardsIgnoreEnd
-            $accessor = new DatabaseAccessor(System::getContainer()->get('database_connection'));
-            assert($accessor instanceof DatabaseAccessor);
+            $connection = System::getContainer()->get('database_connection');
+            assert($connection instanceof Connection);
+            $accessor = new DatabaseAccessor($connection);
         }
         $this->accessor = $accessor;
     }
@@ -100,10 +104,8 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
      */
     public function getFieldDefinition($arrOverrides = [])
     {
-        /** @psalm-suppress DeprecatedMethod */
-        $strActiveLanguage = $this->getMetaModel()->getActiveLanguage();
-        /** @psalm-suppress DeprecatedMethod */
-        $strFallbackLanguage = $this->getMetaModel()->getFallbackLanguage();
+        $strActiveLanguage   = $this->getActiveLanguage();
+        $strFallbackLanguage = $this->getMainLanguage();
         $arrAllColLabels     = StringUtil::deserialize($this->get('translatedtabletext_cols'), true);
 
         if (\array_key_exists($strActiveLanguage, $arrAllColLabels)) {
@@ -193,7 +195,7 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
             $arrReturn['params'][]   = $intCol;
         }
 
-        if ($strLangCode) {
+        if (null !== $strLangCode) {
             $arrReturn['procedure'] .= ' AND langcode=?';
             $arrReturn['params'][]   = $strLangCode;
         }
@@ -286,7 +288,7 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
 
         foreach ($arrIds as $intId) {
             // Walk every row.
-            foreach ((array) $arrValues[$intId] as $row) {
+            foreach ($arrValues[$intId] as $row) {
                 // Walk every column and insert the value.
                 foreach ($row as $cell) {
                     if (empty($cell['value'])) {
@@ -332,7 +334,7 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
     public function setDataFor($arrValues)
     {
         /** @psalm-suppress DeprecatedMethod */
-        $this->setTranslatedDataFor($arrValues, $this->getMetaModel()->getActiveLanguage());
+        $this->setTranslatedDataFor($arrValues, $this->getActiveLanguage());
     }
 
     /**
@@ -341,17 +343,17 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
     public function getDataFor($arrIds)
     {
         /** @psalm-suppress DeprecatedMethod */
-        $strActiveLanguage = $this->getMetaModel()->getActiveLanguage();
+        $strActiveLanguage = $this->getActiveLanguage();
         /** @psalm-suppress DeprecatedMethod */
-        $strFallbackLanguage = $this->getMetaModel()->getFallbackLanguage();
+        $strFallbackLanguage = $this->getMainLanguage();
 
         $arrReturn = $this->getTranslatedDataFor($arrIds, $strActiveLanguage);
 
         // Second round, fetch fallback languages if not all items could be resolved.
-        if ((\count($arrReturn) < \count($arrIds)) && ($strActiveLanguage !== $strFallbackLanguage)) {
+        if (($strActiveLanguage !== $strFallbackLanguage) && (\count($arrReturn) < \count($arrIds))) {
             $arrFallbackIds = [];
             foreach ($arrIds as $intId) {
-                if (empty($arrReturn[$intId])) {
+                if ([] === ($arrReturn[$intId] ?? [])) {
                     $arrFallbackIds[] = $intId;
                 }
             }
@@ -374,17 +376,32 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
      */
     public function unsetDataFor($arrIds)
     {
-        if (!\is_array($arrIds)) {
-            throw new \RuntimeException(
-                'TranslatedTableText::unsetDataFor() invalid parameter given! Array of ids is needed.',
-                1
-            );
-        }
-
         if (empty($arrIds)) {
             return;
         }
 
         $this->accessor->removeDataForIds($this->get('id'), $arrIds);
+    }
+
+    private function getActiveLanguage(): string
+    {
+        $metaModel = $this->getMetaModel();
+        if ($metaModel instanceof ITranslatedMetaModel) {
+            return $metaModel->getLanguage();
+        }
+
+        /** @psalm-suppress DeprecatedMethod */
+         return $metaModel->getActiveLanguage();
+    }
+
+    private function getMainLanguage(): string
+    {
+        $metaModel = $this->getMetaModel();
+        if ($metaModel instanceof ITranslatedMetaModel) {
+            return $metaModel->getMainLanguage();
+        }
+
+        /** @psalm-suppress DeprecatedMethod */
+        return $metaModel->getFallbackLanguage() ?? 'en';
     }
 }

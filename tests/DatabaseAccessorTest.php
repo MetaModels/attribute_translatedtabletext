@@ -20,9 +20,10 @@
 
 namespace MetaModels\AttributeTranslatedTableTextBundle\Test;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use MetaModels\AttributeTranslatedTableTextBundle\DatabaseAccessor;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -100,7 +101,7 @@ class DatabaseAccessorTest extends TestCase
             ->willReturn($insertBuilder);
         $insertBuilder
             ->expects(self::once())
-            ->method('execute');
+            ->method('executeQuery');
 
         $connection = $this->mockConnection();
         $connection->expects(self::once())->method('createQueryBuilder')->willReturn($insertBuilder);
@@ -156,6 +157,8 @@ class DatabaseAccessorTest extends TestCase
      * Test that fetching of data works.
      *
      * @return void
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function testFetchDataFor(): void
     {
@@ -175,7 +178,7 @@ class DatabaseAccessorTest extends TestCase
         $queryBuilder
             ->expects(self::once())
             ->method('from')
-            ->with('tl_metamodel_translatedtabletext')
+            ->with('tl_metamodel_translatedtabletext', 't')
             ->willReturn($queryBuilder);
         $queryBuilder
             ->expects(self::once())
@@ -185,36 +188,73 @@ class DatabaseAccessorTest extends TestCase
         $queryBuilder
             ->expects(self::exactly(2))
             ->method('addOrderBy')
-            ->withConsecutive(['t.row', 'ASC'], ['t.col', 'ASC'])
-            ->willReturn($queryBuilder);
+            ->willReturnCallback(static function (string $column, string $direction) use ($queryBuilder): QueryBuilder {
+                static $callCount = 0;
+                switch (++$callCount) {
+                    case 1:
+                        self::assertSame('t.row', $column);
+                        self::assertSame('ASC', $direction);
+                        return $queryBuilder;
+                    case 2:
+                        self::assertSame('t.col', $column);
+                        self::assertSame('ASC', $direction);
+                        return $queryBuilder;
+                }
+                self::fail('Called too many times');
+            });
         $queryBuilder
             ->expects(self::exactly(3))
             ->method('andWhere')
-            ->withConsecutive(
-                ['t.att_id=:att_id'],
-                ['t.item_id IN (:item_ids)'],
-                ['t.langcode=:langcode']
-            )
-            ->willReturn($queryBuilder);
+            ->willReturnCallback(static function (string $condition) use ($queryBuilder): QueryBuilder {
+                static $callCount = 0;
+                switch (++$callCount) {
+                    case 1:
+                        self::assertSame('t.att_id=:att_id', $condition);
+                        return $queryBuilder;
+                    case 2:
+                        self::assertSame('t.item_id IN (:item_ids)', $condition);
+                        return $queryBuilder;
+                    case 3:
+                        self::assertSame('t.langcode=:langcode', $condition);
+                        return $queryBuilder;
+                }
+                self::fail('Called too many times');
+            });
+
         $queryBuilder
             ->expects(self::exactly(3))
             ->method('setParameter')
-            ->withConsecutive(
-                ['att_id', 42],
-                ['item_ids', [21], Connection::PARAM_STR_ARRAY],
-                ['langcode', 'en']
-            )
-            ->willReturn($queryBuilder);
+            ->willReturnCallback(
+                static function (string $parameter, mixed $value, ?int $type = null) use ($queryBuilder): QueryBuilder {
+                    static $callCount = 0;
+                    switch (++$callCount) {
+                        case 1:
+                            self::assertSame('att_id', $parameter);
+                            self::assertSame('42', $value);
+                            return $queryBuilder;
+                        case 2:
+                            self::assertSame('item_ids', $parameter);
+                            self::assertSame([21], $value);
+                            self::assertSame(ArrayParameterType::STRING, $type);
+                            return $queryBuilder;
+                        case 3:
+                            self::assertSame('langcode', $parameter);
+                            self::assertSame('en', $value);
+                            return $queryBuilder;
+                    }
+                    self::fail('Called too many times');
+                }
+            );
 
-        $mockResult = $this->getMockBuilder(Statement::class)->disableOriginalConstructor()->getMock();
+        $mockResult = $this->getMockBuilder(Result::class)->disableOriginalConstructor()->getMock();
         $queryBuilder
             ->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($mockResult);
 
         $mockResult
             ->expects(self::exactly(6))
-            ->method('fetch')
+            ->method('fetchAssociative')
             ->willReturnOnConsecutiveCalls(
                 $this->langRow(1, '1', '42', 0, 0, 21, 'en'),
                 $this->langRow(1, '2', '42', 0, 1, 21, 'en'),
@@ -228,22 +268,22 @@ class DatabaseAccessorTest extends TestCase
         self::assertSame(
             [21 => [
                 0 => [
-                    $this->langRow(1, '1', '42', 0, 0, 21, 'en'),
-                    $this->langRow(1, '2', '42', 0, 1, 21, 'en'),
-                    $this->langRow(1, '3', '42', 0, 2, 21, 'en'),
+                    $this->langRow(1, '1', '42', 0, 0, '21', 'en'),
+                    $this->langRow(1, '2', '42', 0, 1, '21', 'en'),
+                    $this->langRow(1, '3', '42', 0, 2, '21', 'en'),
                 ],
                 1 => [
-                    $this->langRow(0, '', '42', 1, 0, 21, 'en'),
-                    $this->langRow(0, '', '42', 1, 1, 21, 'en'),
-                    $this->langRow(0, '', '42', 1, 2, 21, 'en'),
+                    $this->langRow(0, '', '42', 1, 0, '21', 'en'),
+                    $this->langRow(0, '', '42', 1, 1, '21', 'en'),
+                    $this->langRow(0, '', '42', 1, 2, '21', 'en'),
                 ],
                 2 => [
-                    $this->langRow(1, '4', '42', 2, 0, 21, 'en'),
-                    $this->langRow(0, '', '42', 2, 1, 21, 'en'),
-                    $this->langRow(1, '6', '42', 2, 2, 21, 'en'),
+                    $this->langRow(1, '4', '42', 2, 0, '21', 'en'),
+                    $this->langRow(0, '', '42', 2, 1, '21', 'en'),
+                    $this->langRow(1, '6', '42', 2, 2, '21', 'en'),
                 ]
             ]],
-            $accessor->fetchDataFor(42, [21], 'en', 3)
+            $accessor->fetchDataFor('42', [21], 'en', 3)
         );
     }
 
