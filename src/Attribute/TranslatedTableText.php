@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_translatedtabletext.
  *
- * (c) 2012-2023 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -19,7 +19,7 @@
  * @author     Ingolf Steinhardt <info@e-spin.de>
  * @author     David Molineus <david.molineus@netzmacht.de>
  * @author     Sven Baumann <baumann.sv@gmail.com>
- * @copyright  2012-2023 The MetaModels team.
+ * @copyright  2012-2024 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_translatedtabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -28,14 +28,20 @@ namespace MetaModels\AttributeTranslatedTableTextBundle\Attribute;
 
 use Contao\StringUtil;
 use Contao\System;
+use Doctrine\DBAL\Connection;
 use MetaModels\Attribute\Base;
 use MetaModels\Attribute\IComplex;
 use MetaModels\AttributeTranslatedTableTextBundle\DatabaseAccessor;
 use MetaModels\IMetaModel;
 use MetaModels\Attribute\ITranslated;
+use MetaModels\ITranslatedMetaModel;
 
 /**
  * This is the MetaModelAttribute class for handling translated table text fields.
+ *
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.NPathComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class TranslatedTableText extends Base implements ITranslated, IComplex
 {
@@ -44,18 +50,19 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
      *
      * @var DatabaseAccessor
      */
-    private $accessor;
+    private DatabaseAccessor $accessor;
 
     /**
      * Instantiate an MetaModel attribute.
      *
      * Note that you should not use this directly but use the factory classes to instantiate attributes.
      *
-     * @param IMetaModel       $objMetaModel The MetaModel instance this attribute belongs to.
-     * @param array            $arrData      The information array, for attribute information, refer to documentation of
-     *                                       table tl_metamodel_attribute and documentation of the certain attribute
-     *                                       classes for information what values are understood.
-     * @param DatabaseAccessor $accessor     Database connection.
+     * @param IMetaModel            $objMetaModel The MetaModel instance this attribute belongs to.
+     * @param array                 $arrData      The information array, for attribute information, refer to
+     *                                            documentation of table tl_metamodel_attribute and documentation of
+     *                                            the certain attribute classes for information what values are
+     *                                            understood.
+     * @param DatabaseAccessor|null $accessor     Database connection.
      */
     public function __construct(IMetaModel $objMetaModel, array $arrData = [], DatabaseAccessor $accessor = null)
     {
@@ -63,14 +70,15 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
 
         if (null === $accessor) {
             // @codingStandardsIgnoreStart
-            @\trigger_error(
-                'DatabaseAccessor is missing. It has to be passed in the constructor. Fallback will be dropped.',
+            @trigger_error(
+                'Connection is missing. It has to be passed in the constructor. Fallback will be dropped.',
                 E_USER_DEPRECATED
             );
             // @codingStandardsIgnoreEnd
-            $accessor = new DatabaseAccessor(System::getContainer()->get('database_connection'));
+            $connection = System::getContainer()->get('database_connection');
+            assert($connection instanceof Connection);
+            $accessor = new DatabaseAccessor($connection);
         }
-
         $this->accessor = $accessor;
     }
 
@@ -96,8 +104,8 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
      */
     public function getFieldDefinition($arrOverrides = [])
     {
-        $strActiveLanguage   = $this->getMetaModel()->getActiveLanguage();
-        $strFallbackLanguage = $this->getMetaModel()->getFallbackLanguage();
+        $strActiveLanguage   = $this->getActiveLanguage();
+        $strFallbackLanguage = $this->getMainLanguage();
         $arrAllColLabels     = StringUtil::deserialize($this->get('translatedtabletext_cols'), true);
 
         if (\array_key_exists($strActiveLanguage, $arrAllColLabels)) {
@@ -156,11 +164,8 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
      * Build a where clause for the given id(s) and rows/cols.
      *
      * @param mixed  $mixIds      One, none or many ids to use.
-     *
      * @param string $strLangCode The language code, optional.
-     *
      * @param int    $intRow      The row number, optional.
-     *
      * @param int    $intCol      The col number, optional.
      *
      * @return array
@@ -190,7 +195,7 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
             $arrReturn['params'][]   = $intCol;
         }
 
-        if ($strLangCode) {
+        if (null !== $strLangCode) {
             $arrReturn['procedure'] .= ' AND langcode=?';
             $arrReturn['params'][]   = $strLangCode;
         }
@@ -283,7 +288,7 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
 
         foreach ($arrIds as $intId) {
             // Walk every row.
-            foreach ((array) $arrValues[$intId] as $row) {
+            foreach ($arrValues[$intId] as $row) {
                 // Walk every column and insert the value.
                 foreach ($row as $cell) {
                     if (empty($cell['value'])) {
@@ -328,7 +333,8 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
      */
     public function setDataFor($arrValues)
     {
-        $this->setTranslatedDataFor($arrValues, $this->getMetaModel()->getActiveLanguage());
+        /** @psalm-suppress DeprecatedMethod */
+        $this->setTranslatedDataFor($arrValues, $this->getActiveLanguage());
     }
 
     /**
@@ -336,16 +342,18 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
      */
     public function getDataFor($arrIds)
     {
-        $strActiveLanguage   = $this->getMetaModel()->getActiveLanguage();
-        $strFallbackLanguage = $this->getMetaModel()->getFallbackLanguage();
+        /** @psalm-suppress DeprecatedMethod */
+        $strActiveLanguage = $this->getActiveLanguage();
+        /** @psalm-suppress DeprecatedMethod */
+        $strFallbackLanguage = $this->getMainLanguage();
 
         $arrReturn = $this->getTranslatedDataFor($arrIds, $strActiveLanguage);
 
         // Second round, fetch fallback languages if not all items could be resolved.
-        if ((\count($arrReturn) < \count($arrIds)) && ($strActiveLanguage != $strFallbackLanguage)) {
+        if (($strActiveLanguage !== $strFallbackLanguage) && (\count($arrReturn) < \count($arrIds))) {
             $arrFallbackIds = [];
             foreach ($arrIds as $intId) {
-                if (empty($arrReturn[$intId])) {
+                if ([] === ($arrReturn[$intId] ?? [])) {
                     $arrFallbackIds[] = $intId;
                 }
             }
@@ -368,17 +376,32 @@ class TranslatedTableText extends Base implements ITranslated, IComplex
      */
     public function unsetDataFor($arrIds)
     {
-        if (!\is_array($arrIds)) {
-            throw new \RuntimeException(
-                'TranslatedTableText::unsetDataFor() invalid parameter given! Array of ids is needed.',
-                1
-            );
-        }
-
         if (empty($arrIds)) {
             return;
         }
 
         $this->accessor->removeDataForIds($this->get('id'), $arrIds);
+    }
+
+    private function getActiveLanguage(): string
+    {
+        $metaModel = $this->getMetaModel();
+        if ($metaModel instanceof ITranslatedMetaModel) {
+            return $metaModel->getLanguage();
+        }
+
+        /** @psalm-suppress DeprecatedMethod */
+         return $metaModel->getActiveLanguage();
+    }
+
+    private function getMainLanguage(): string
+    {
+        $metaModel = $this->getMetaModel();
+        if ($metaModel instanceof ITranslatedMetaModel) {
+            return $metaModel->getMainLanguage();
+        }
+
+        /** @psalm-suppress DeprecatedMethod */
+        return $metaModel->getFallbackLanguage() ?? 'en';
     }
 }
