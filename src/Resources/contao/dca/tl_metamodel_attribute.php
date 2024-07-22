@@ -78,7 +78,7 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['translatedtabletext_cols
         'tl_class'       => 'clr w50',
         'columnFields'   => [
             'langcode'  => [
-                'label'     => ['langcode'],
+                'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tabletext_langcode'],
                 'exclude'   => true,
                 'inputType' => 'justtextoption',
                 'eval'      => [
@@ -87,7 +87,7 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['translatedtabletext_cols
                 ],
             ],
             'rowLabels' => [
-                'label'     => ['rowLabels'],
+                'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tabletext_rowLabels'],
                 'exclude'   => true,
                 'inputType' => 'multiColumnWizard',
                 'eval'      => [
@@ -96,7 +96,7 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['translatedtabletext_cols
                     'tl_class'       => 'clr',
                     'columnFields'   => [
                         'rowLabel' => [
-                            'label'     => ['rowLabel'],
+                            'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tabletext_rowLabel'],
                             'exclude'   => true,
                             'inputType' => 'text',
                             'eval'      => [
@@ -105,7 +105,7 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['translatedtabletext_cols
                             ],
                         ],
                         'rowStyle' => [
-                            'label'     => ['rowStyle'],
+                            'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tabletext_rowStyle'],
                             'exclude'   => true,
                             'inputType' => 'text',
                             'eval'      => [
