@@ -55,8 +55,8 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['dca_config']['childCondition'][] =
 ];
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tabletext_quantity_cols'] = [
-    'label'       => 'tabletext_quantity_cols.label',
-    'description' => 'tabletext_quantity_cols.description',
+    'label'       => 'translatedtabletext_quantity_cols.label',
+    'description' => 'translatedtabletext_quantity_cols.description',
     'exclude'     => true,
     'inputType'   => 'select',
     'default'     => 1,
@@ -70,8 +70,8 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tabletext_quantity_cols'
 ];
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['translatedtabletext_cols'] = [
-    'label'       => 'tabletext_cols.label',
-    'description' => 'tabletext_cols.description',
+    'label'       => 'translatedtabletext_cols.label',
+    'description' => 'translatedtabletext_cols.description',
     'exclude'     => true,
     'inputType'   => 'multiColumnWizard',
     'eval'        => [
@@ -81,17 +81,17 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['translatedtabletext_cols
         'tl_class'       => 'clr w50',
         'columnFields'   => [
             'langcode'  => [
-                'label'       => 'tabletext_langcode.label',
-                'exclude'     => true,
-                'inputType'   => 'justtextoption',
-                'eval'        => [
+                'label'     => 'translatedtabletext_langcode.label',
+                'exclude'   => true,
+                'inputType' => 'justtextoption',
+                'eval'      => [
                     'style'  => 'min-width:75px;display:block;padding-top:28px;',
                     'valign' => 'top',
                 ],
             ],
             'rowLabels' => [
-                'label'       => 'tabletext_rowLabels.label',
-                'description' => 'tabletext_rowLabels.description',
+                'label'       => 'translatedtabletext_rowLabels.label',
+                'description' => 'translatedtabletext_rowLabels.description',
                 'exclude'     => true,
                 'inputType'   => 'multiColumnWizard',
                 'eval'        => [
@@ -101,8 +101,8 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['translatedtabletext_cols
                     'tl_class'       => 'clr',
                     'columnFields'   => [
                         'rowLabel' => [
-                            'label'       => 'tabletext_rowLabel.label',
-                            'description' => 'tabletext_rowLabel.description',
+                            'label'       => 'translatedtabletext_rowLabel.label',
+                            'description' => 'translatedtabletext_rowLabel.description',
                             'exclude'     => true,
                             'inputType'   => 'text',
                             'eval'        => [
@@ -111,8 +111,8 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['translatedtabletext_cols
                             ],
                         ],
                         'rowStyle' => [
-                            'label'       => 'tabletext_rowStyle.label',
-                            'description' => 'tabletext_rowStyle.description',
+                            'label'       => 'translatedtabletext_rowStyle.label',
+                            'description' => 'translatedtabletext_rowStyle.description',
                             'exclude'     => true,
                             'inputType'   => 'text',
                             'eval'        => [
