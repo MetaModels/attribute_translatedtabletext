@@ -142,7 +142,7 @@ class BackendTableListener
         $arrLanguages = [];
         /** @psalm-suppress DeprecatedMethod */
         foreach ((array) $objMetaModel->getAvailableLanguages() as $strLangCode) {
-            $arrLanguages[$strLangCode] = $translator->translate($strLangCode, 'LNG');
+            $arrLanguages[$strLangCode] = $translator->translate('LNG.' . $strLangCode, 'contao_languages');
         }
         \asort($arrLanguages);
 
@@ -172,22 +172,10 @@ class BackendTableListener
 
         $data['columnFields']['langcode']['options']            = $arrLanguages;
         $data['columnFields']['langcode']['eval']['rowClasses'] = $arrRowClasses;
-        $data['columnFields']['rowLabels']['label']             = $translator->translate(
-            'tabletext_rowLabels.0',
-            'tl_metamodel_attribute'
-        );
 
-        $data['columnFields']['rowLabels']['eval']['minCount']                          = $intCols;
-        $data['columnFields']['rowLabels']['eval']['maxCount']                          = $intCols;
-        $data['columnFields']['rowLabels']['eval']['columnFields']['rowLabel']['label'] = $translator->translate(
-            'tabletext_rowLabel.0',
-            'tl_metamodel_attribute'
-        );
+        $data['columnFields']['rowLabels']['eval']['minCount'] = $intCols;
+        $data['columnFields']['rowLabels']['eval']['maxCount'] = $intCols;
 
-        $data['columnFields']['rowLabels']['eval']['columnFields']['rowStyle']['label'] = $translator->translate(
-            'tabletext_rowStyle.0',
-            'tl_metamodel_attribute'
-        );
 
         $event->getProperty()->setExtra($data);
     }
@@ -256,8 +244,8 @@ class BackendTableListener
 
         // Sort like in MetaModel definition.
         /** @psalm-suppress DeprecatedMethod */
-        $arrLanguages  = $metaModel->getAvailableLanguages();
-        $arrOutput     = [];
+        $arrLanguages = $metaModel->getAvailableLanguages();
+        $arrOutput    = [];
 
         if (null !== $arrLanguages) {
             foreach ($arrLanguages as $strLangCode) {
