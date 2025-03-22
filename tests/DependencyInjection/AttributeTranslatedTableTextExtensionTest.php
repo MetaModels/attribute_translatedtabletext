@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_translatedtabletext.
  *
- * (c) 2012-2021 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,7 +13,8 @@
  * @package    MetaModels/attribute_translatedtabletext
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Sven Baumann <baumann.sv@gmail.com>
- * @copyright  2012-2021 The MetaModels team.
+ * @author     Ingolf Steinhardt <info@e-spin.de>
+ * @copyright  2012-2024 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_translatedtabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -34,6 +35,8 @@ use Symfony\Component\DependencyInjection\Reference;
  * This test case test the extension.
  *
  * @covers \MetaModels\AttributeTranslatedTableTextBundle\DependencyInjection\MetaModelsAttributeTranslatedTableTextExtension
+ *
+ * @SuppressWarnings(PHPMD.LongClassName)
  */
 class AttributeTranslatedTableTextExtensionTest extends TestCase
 {
@@ -57,58 +60,27 @@ class AttributeTranslatedTableTextExtensionTest extends TestCase
      */
     public function testFactoryIsRegistered()
     {
-        $container = $this->getMockBuilder(ContainerBuilder::class)->getMock();
-
-        $container
-            ->expects(self::exactly(3))
-            ->method('setDefinition')
-            ->withConsecutive(
-                [
-                    'metamodels.attribute_translatedtabletext.factory',
-                    self::callback(
-                        function ($value) {
-                            /** @var Definition $value */
-                            $this->assertInstanceOf(Definition::class, $value);
-                            $this->assertEquals(AttributeTypeFactory::class, $value->getClass());
-                            $this->assertCount(1, $value->getTag('metamodels.attribute_factory'));
-                            $this->assertCount(1, $arguments = $value->getArguments());
-                            $this->assertInstanceOf(Reference::class, $arguments[0]);
-                            $this->assertSame(DatabaseAccessor::class, (string) $arguments[0]);
-
-                            return true;
-                        }
-                    )
-                ],
-                [
-                    DatabaseAccessor::class,
-                    self::callback(
-                        function ($value) {
-                            /** @var Definition $value */
-                            $this->assertInstanceOf(Definition::class, $value);
-                            $this->assertCount(1, $arguments = $value->getArguments());
-                            $this->assertInstanceOf(Reference::class, $arguments[0]);
-                            $this->assertSame('database_connection', (string) $arguments[0]);
-
-                            return true;
-                        }
-                    )
-                ],
-                [
-                    'metamodels.attribute_translatedtabletext.listeners.translated_alias_options',
-                    self::callback(
-                        function ($value) {
-                            /** @var Definition $value */
-                            $this->assertInstanceOf(Definition::class, $value);
-                            $this->assertEquals(BackendTableListener::class, $value->getClass());
-                            $this->assertCount(3, $value->getTag('kernel.event_listener'));
-
-                            return true;
-                        }
-                    )
-                ]
-            );
+        $container = new ContainerBuilder();
 
         $extension = new MetaModelsAttributeTranslatedTableTextExtension();
         $extension->load([], $container);
+
+        self::assertTrue($container->hasDefinition('metamodels.attribute_translatedtabletext.factory'));
+        $definition = $container->getDefinition('metamodels.attribute_translatedtabletext.factory');
+        self::assertCount(1, $definition->getTag('metamodels.attribute_factory'));
+        self::assertCount(1, $arguments = $definition->getArguments());
+        self::assertInstanceOf(Reference::class, $arguments[0]);
+        self::assertSame(DatabaseAccessor::class, (string) $arguments[0]);
+
+        self::assertTrue($container->hasDefinition(DatabaseAccessor::class));
+        $definition = $container->getDefinition(DatabaseAccessor::class);
+        self::assertCount(1, $arguments = $definition->getArguments());
+        self::assertInstanceOf(Reference::class, $arguments[0]);
+        self::assertSame('database_connection', (string) $arguments[0]);
+        // phpcs:disable
+        self::assertTrue($container->hasDefinition('metamodels.attribute_translatedtabletext.listeners.translated_alias_options'));
+        $definition = $container->getDefinition('metamodels.attribute_translatedtabletext.listeners.translated_alias_options');
+        self::assertCount(3, $definition->getTag('kernel.event_listener'));
+        // phpcs:enable
     }
 }

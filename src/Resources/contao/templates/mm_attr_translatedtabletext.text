@@ -1,10 +1,9 @@
 <?php
+$rowCount = count((array) $this->raw);
 foreach ((array) $this->raw as $k => $row) {
     foreach ($row as $kk => $col) {
         echo (($kk != 0) ? ' ' : '') . $col['value'];
     }
-    if ($k != (count((array) $this->raw['value']) - 1)) {
-        echo "\n";
-    }
+    if ($k != ($rowCount - 1)) echo "\n";
 }
 ?>
